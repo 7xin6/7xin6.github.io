@@ -14,6 +14,8 @@
 
 
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
@@ -22,9 +24,9 @@
 
   <meta name="description" content="你尽管努力剩下的交给天意">
 <meta property="og:type" content="website">
-<meta property="og:title" content="江月">
+<meta property="og:title" content="江月随笔">
 <meta property="og:url" content="http://example.com/archives/index.html">
-<meta property="og:site_name" content="江月">
+<meta property="og:site_name" content="江月随笔">
 <meta property="og:description" content="你尽管努力剩下的交给天意">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:author" content="江月">
@@ -43,7 +45,7 @@
   };
 </script>
 
-  <title>归档 | 江月</title>
+  <title>归档 | 江月随笔</title>
   
 
 
@@ -94,7 +96,7 @@
 
     <a href="/" class="brand" rel="start">
       <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">江月</h1>
+      <h1 class="site-title">江月随笔</h1>
       <span class="logo-line-after"><i></i></span>
     </a>
   </div>
@@ -115,9 +117,29 @@
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
         <li class="menu-item menu-item-archives">
 
     <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-resources">
+
+    <a href="/resources/" rel="section"><i class="fas fa-sticky-note fa-fw"></i>资源</a>
 
   </li>
   </ul>
@@ -150,13 +172,33 @@
   <div class="post-block">
     <div class="posts-collapse">
       <div class="collection-title">
-        <span class="collection-header">嗯..! 目前共计 1 篇日志。 继续努力。</span>
+        <span class="collection-header">嗯..! 目前共计 2 篇日志。 继续努力。</span>
       </div>
 
       
     <div class="collection-year">
       <span class="collection-header">2023</span>
     </div>
+
+  <article itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      <div class="post-meta">
+        <time itemprop="dateCreated"
+              datetime="2023-07-29T16:41:28+08:00"
+              content="2023-07-29">
+          07-29
+        </time>
+      </div>
+
+      <div class="post-title">
+          <a class="post-title-link" href="/2023/07/29/my-first-blog/" itemprop="url">
+            <span itemprop="name">my-first-blog</span>
+          </a>
+      </div>
+
+    </header>
+  </article>
 
   <article itemscope itemtype="http://schema.org/Article">
     <header class="post-header">
@@ -242,6 +284,8 @@
 
       <div class="site-overview-wrap sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="江月"
+      src="/images/avatar.jpg">
   <p class="site-author-name" itemprop="name">江月</p>
   <div class="site-description" itemprop="description">你尽管努力剩下的交给天意</div>
 </div>
@@ -250,7 +294,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">1</span>
+          <span class="site-state-item-count">2</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -277,7 +321,7 @@
 
 <div class="copyright">
   
-  &copy; 
+  &copy; 2023-07 – 
   <span itemprop="copyrightYear">2023</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
@@ -339,4 +383,6 @@
   
 
 </body>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/love.js"></script>
 </html>
