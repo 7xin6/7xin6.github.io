@@ -22,30 +22,34 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="你尽管努力剩下的交给天意">
-<meta property="og:type" content="website">
-<meta property="og:title" content="江月随笔">
-<meta property="og:url" content="http://example.com/index.html">
+  <meta name="description" content="在Go语言项目中使用Zap日志库一、介绍在许多Go语言项目中，我们需要一个好的日志记录器能够提供下面这些功能：  能够将事件记录到文件中，而不是应用程序控制台。 日志切割-能够根据文件大小、时间或间隔等来切割日志文件。 支持不同的日志级别。例如INFO，DEBUG，ERROR等。 能够打印基本信息，如调用文件&#x2F;函数名和行号，日志时间等。  二、默认的Go Logger在介绍Uber-go">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在Go语言项目中使用Zap日志库">
+<meta property="og:url" content="http://example.com/2023/07/29/%E5%9C%A8Go%E8%AF%AD%E8%A8%80%E9%A1%B9%E7%9B%AE%E4%B8%AD%E4%BD%BF%E7%94%A8Zap%E6%97%A5%E5%BF%97%E5%BA%93/index.html">
 <meta property="og:site_name" content="江月随笔">
-<meta property="og:description" content="你尽管努力剩下的交给天意">
+<meta property="og:description" content="在Go语言项目中使用Zap日志库一、介绍在许多Go语言项目中，我们需要一个好的日志记录器能够提供下面这些功能：  能够将事件记录到文件中，而不是应用程序控制台。 日志切割-能够根据文件大小、时间或间隔等来切割日志文件。 支持不同的日志级别。例如INFO，DEBUG，ERROR等。 能够打印基本信息，如调用文件&#x2F;函数名和行号，日志时间等。  二、默认的Go Logger在介绍Uber-go">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-07-29T12:59:37.000Z">
+<meta property="article:modified_time" content="2023-07-29T13:17:58.037Z">
 <meta property="article:author" content="江月">
+<meta property="article:tag" content="gin">
+<meta property="article:tag" content="日志">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://example.com/">
+<link rel="canonical" href="http://example.com/2023/07/29/%E5%9C%A8Go%E8%AF%AD%E8%A8%80%E9%A1%B9%E7%9B%AE%E4%B8%AD%E4%BD%BF%E7%94%A8Zap%E6%97%A5%E5%BF%97%E5%BA%93/">
 
 
 <script id="page-configurations">
   // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
-    isHome : true,
-    isPost : false,
+    isHome : false,
+    isPost : true,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>江月随笔</title>
+  <title>在Go语言项目中使用Zap日志库 | 江月随笔</title>
   
 
 
@@ -163,85 +167,10 @@
         <div class="content-wrap">
           
 
-          <div class="content index posts-expand">
+          <div class="content post posts-expand">
             
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/07/29/%E5%88%86%E5%B8%83%E5%BC%8FID%E7%AE%97%E6%B3%95/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="江月">
-      <meta itemprop="description" content="你尽管努力剩下的交给天意">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="江月随笔">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/07/29/%E5%88%86%E5%B8%83%E5%BC%8FID%E7%AE%97%E6%B3%95/" class="post-title-link" itemprop="url">分布式ID算法</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2023-07-29 21:20:07 / 修改时间：21:30:14" itemprop="dateCreated datePublished" datetime="2023-07-29T21:20:07+08:00">2023-07-29</time>
-            </span>
-
-          
-
-        </div>
-      </header>
 
     
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="一、分布式ID简介"><a href="#一、分布式ID简介" class="headerlink" title="一、分布式ID简介"></a>一、分布式ID简介</h2><h3 id="1、什么是分布式ID？"><a href="#1、什么是分布式ID？" class="headerlink" title="1、什么是分布式ID？"></a>1、什么是分布式ID？</h3><p>在我们业务数据量不大的时候，单库单表完全可以支撑现有业务，数据再大一点搞个MySQL主从同步读写分离也能对付。</p>
-<p>但随着数据日渐增长，主从同步也扛不住了，就需要对数据库进行分库分表，但分库分表后需要有一个唯一ID来标识一条数据，数据库的自增ID显然不能满足需求；例如我们的订单，需要有一个全局唯一标识的订单号，这个订单号就是分布式ID</p>
-<h3 id="2、分布式ID需要满足那些条件？"><a href="#2、分布式ID需要满足那些条件？" class="headerlink" title="2、分布式ID需要满足那些条件？"></a>2、分布式ID需要满足那些条件？</h3><p><strong>全局唯一</strong>: 必须保证ID是全局性唯一的，基本要求<br><strong>高可用：</strong><br><strong>高性能：</strong>高可用低延时，ID生成响应要块，否则反倒会成为业务瓶颈<br><strong>简单通用：</strong>拿来即用的原则</p>
-<h3 id="3、分布式ID算法"><a href="#3、分布式ID算法" class="headerlink" title="3、分布式ID算法"></a>3、分布式ID算法</h3><h4 id="1-、UUID"><a href="#1-、UUID" class="headerlink" title="(1)、UUID"></a>(1)、UUID</h4><h5 id="Java-代码示例："><a href="#Java-代码示例：" class="headerlink" title="Java 代码示例："></a><strong>Java 代码示例：</strong></h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">String uuid = UUID.randomUUID().toString().replaceAll(&quot;-&quot;,&quot;&quot;);​</span><br></pre></td></tr></table></figure>
-
-<h5 id="优点："><a href="#优点：" class="headerlink" title="优点："></a><strong>优点：</strong></h5><p>足够简单，只需要上面一行代码即可生成一个全局唯一的ID，</p>
-<h5 id="缺点："><a href="#缺点：" class="headerlink" title="缺点："></a><strong>缺点：</strong></h5><p>因为UUID是随机的，没有具体的业务含义，如果用UUID作为订单号，是没有意义的，从这个UUID看不到跟订单有任何的关联关系，<br>UUID是一个无序的字符串，包含 字符、数字、 - 组成不具备趋势自增特性<br>长度过长，存储以及查询对MySQL的性能消耗较大，如果用来作为主键，索引的性能会很差</p>
-<h4 id="2-、雪花算法（Snowflake）"><a href="#2-、雪花算法（Snowflake）" class="headerlink" title="(2)、雪花算法（Snowflake）"></a>(2)、雪花算法<strong>（Snowflake）</strong></h4><p><strong>雪花算法</strong>（Snowflake）是twitter公司内部分布式项目采用的ID生成算法，开源后广受国内大厂的好评，在该算法影响下各大公司相继开发出各具特色的分布式生成器。</p>
-<p><img src="https://img-blog.csdnimg.cn/20200904194923535.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0NyeXN0YWxxeQ==,size_16,color_FFFFFF,t_70" alt="img"></p>
-<p>Snowflake生成的是Long类型的ID，一个Long类型占8个字节，每个字节占8比特，也就是说一个Long类型占64个比特。</p>
-<p>Snowflake ID组成结构：<strong>正数位</strong>（占1比特）+ <strong>时间戳</strong>（占41比特）+ <strong>机器ID</strong>（占5比特）+ <strong>数据中心</strong>（占5比特）+ <strong>自增值</strong>（占12比特），总共64比特组成的一个Long类型。</p>
-<p><strong>第一个bit位（1bit）</strong>：Java中long的最高位是符号位代表正负，正数是0，负数是1，一般生成ID都为正数，所以默认为0。<br><strong>时间戳部分（41bit）</strong>：毫秒级的时间，不建议存当前时间戳，而是用（当前时间戳 - 固定开始时间戳）的差值，可以使产生的ID从更小的值开始；41位的时间戳可以使用69年，(1L &lt;&lt; 41) &#x2F; (1000L * 60 * 60 * 24 * 365) &#x3D; 69年<br><strong>工作机器id（10bit）</strong>：也被叫做workId，这个可以灵活配置，机房或者机器号组合都可以。<br><strong>序列号部分（12bit）</strong>：自增值支持同一毫秒内同一个节点可以生成4096个ID<br>Snowflake雪花算法最核心的是中间的10位工作机器ID的分配，做到自动生成workID，避免运维人员的去分配</p>
-<h5 id="优点：-1"><a href="#优点：-1" class="headerlink" title="优点："></a><strong>优点：</strong></h5><p>毫秒数在高位，自增序列在低位，整个ID都是趋势递增的。<br>不依赖数据库等第三方系统，以服务的方式部署，稳定性更高，生成ID的性能也是非常高的。<br>可以根据自身业务特性分配bit位，非常灵活。</p>
-<h5 id="缺点：-1"><a href="#缺点：-1" class="headerlink" title="缺点："></a><strong>缺点：</strong></h5><p>强依赖机器时钟，如果机器上时钟回拨，会导致发号重复或者服务会处于不可用状态。</p>
-<h5 id="go语言代码示例："><a href="#go语言代码示例：" class="headerlink" title="go语言代码示例："></a><strong>go语言代码示例：</strong></h5><h6 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖:"></a><strong>安装依赖:</strong></h6><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">go get &quot;github.com/bwmarrin/snowflake&quot;</span><br></pre></td></tr></table></figure>
-
-<h6 id="完整代码"><a href="#完整代码" class="headerlink" title="完整代码:"></a>完整代码:</h6><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">package snowflakes</span><br><span class="line"></span><br><span class="line">import (</span><br><span class="line">	&quot;time&quot;</span><br><span class="line"></span><br><span class="line">	&quot;github.com/bwmarrin/snowflake&quot;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">var node *snowflake.Node</span><br><span class="line"></span><br><span class="line">func Init(startTime string, machineId int64) (err error) &#123;</span><br><span class="line">	var st time.Time</span><br><span class="line">	st, err = time.Parse(&quot;2006-01-02&quot;, startTime)</span><br><span class="line">	if err != nil &#123;</span><br><span class="line">		return</span><br><span class="line">	&#125;</span><br><span class="line">	snowflake.Epoch = st.UnixNano() / 1000000 // 获取时间戳</span><br><span class="line">	node, err = snowflake.NewNode(machineId)  // 以当前节点的id生成一个雪花节点</span><br><span class="line">	return</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 获取一个雪花算法产生的id</span><br><span class="line">func GenId() int64 &#123;</span><br><span class="line">	return node.Generate().Int64()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
@@ -257,10 +186,9 @@
       <meta itemprop="name" content="江月随笔">
     </span>
       <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/07/29/%E5%9C%A8Go%E8%AF%AD%E8%A8%80%E9%A1%B9%E7%9B%AE%E4%B8%AD%E4%BD%BF%E7%94%A8Zap%E6%97%A5%E5%BF%97%E5%BA%93/" class="post-title-link" itemprop="url">在Go语言项目中使用Zap日志库</a>
-        </h2>
+        <h1 class="post-title" itemprop="name headline">
+          在Go语言项目中使用Zap日志库
+        </h1>
 
         <div class="post-meta">
             <span class="post-meta-item">
@@ -293,7 +221,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="在Go语言项目中使用Zap日志库"><a href="#在Go语言项目中使用Zap日志库" class="headerlink" title="在Go语言项目中使用Zap日志库"></a>在Go语言项目中使用Zap日志库</h2><h3 id="一、介绍"><a href="#一、介绍" class="headerlink" title="一、介绍"></a>一、介绍</h3><p>在许多Go语言项目中，我们需要一个好的日志记录器能够提供下面这些功能：</p>
+        <h2 id="在Go语言项目中使用Zap日志库"><a href="#在Go语言项目中使用Zap日志库" class="headerlink" title="在Go语言项目中使用Zap日志库"></a>在Go语言项目中使用Zap日志库</h2><h3 id="一、介绍"><a href="#一、介绍" class="headerlink" title="一、介绍"></a>一、介绍</h3><p>在许多Go语言项目中，我们需要一个好的日志记录器能够提供下面这些功能：</p>
 <ul>
 <li>能够将事件记录到文件中，而不是应用程序控制台。</li>
 <li>日志切割-能够根据文件大小、时间或间隔等来切割日志文件。</li>
@@ -468,270 +396,37 @@
 <p>至此，我们总结了如何将Zap日志程序集成到Go应用程序项目中。</p>
 <p>翻译自<a target="_blank" rel="noopener" href="https://dev-journal.in/2019/05/27/adding-uber-go-zap-logger-to-golang-project/%EF%BC%8C%E4%B8%BA%E4%BA%86%E6%9B%B4%E5%A5%BD%E7%90%86%E8%A7%A3%E5%8E%9F%E6%96%87%E5%86%85%E5%AE%B9%E7%A8%8D%E6%9C%89%E6%9B%B4%E6%94%B9%E3%80%82">https://dev-journal.in/2019/05/27/adding-uber-go-zap-logger-to-golang-project/，为了更好理解原文内容稍有更改。</a></p>
 
-      
     </div>
 
     
     
     
+
       <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
+          <div class="post-tags">
+              <a href="/tags/gin/" rel="tag"># gin</a>
+              <a href="/tags/%E6%97%A5%E5%BF%97/" rel="tag"># 日志</a>
+          </div>
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/07/29/%E5%9C%A8gin%E6%A1%86%E6%9E%B6%E4%B8%AD%E4%BD%BF%E7%94%A8JWT/">
+        
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="江月">
-      <meta itemprop="description" content="你尽管努力剩下的交给天意">
-    </span>
 
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="江月随笔">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/07/29/%E5%9C%A8gin%E6%A1%86%E6%9E%B6%E4%B8%AD%E4%BD%BF%E7%94%A8JWT/" class="post-title-link" itemprop="url">在gin框架中使用JWT</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2023-07-29 20:24:12 / 修改时间：20:57:44" itemprop="dateCreated datePublished" datetime="2023-07-29T20:24:12+08:00">2023-07-29</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/token/" itemprop="url" rel="index"><span itemprop="name">token</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="1、什么是-JWT-？"><a href="#1、什么是-JWT-？" class="headerlink" title="1、什么是 JWT ？"></a>1、什么是 JWT ？</h2><p>含义：JWT全称 JSON Web Token 是一种跨域认证解决方案，属于一个开放的标准，它规定了一种 Token  实现方式，目前多用于前后端分离项目和OAuth2.0业务场景下。</p>
-<h2 id="2、为什么需要-JWT-？"><a href="#2、为什么需要-JWT-？" class="headerlink" title="2、为什么需要 JWT ？"></a>2、为什么需要 JWT ？</h2><p>在之前的一些web项目（单体项目）中，我们通常使用的是<code>Cookie-Session</code>模式实现用户认证。相关流程大致如下：</p>
-<ol>
-<li>用户在浏览器端填写用户名和密码，并发送给服务端</li>
-<li>服务端对用户名和密码校验通过后会生成一份保存当前用户相关信息的session数据和一个与之对应的标识（通常称为session_id）</li>
-<li>服务端返回响应时将上一步的session_id写入用户浏览器的Cookie</li>
-<li>后续用户来自该浏览器的每次请求都会自动携带包含session_id的Cookie</li>
-<li>服务端通过请求中的session_id就能找到之前保存的该用户那份session数据，从而获取该用户的相关信息。</li>
-</ol>
-<p>这种方案依赖于<strong>客户端（浏览器）保存 Cookie，并且需要在服务端存储用户的session数据</strong>。</p>
-<p>在移动互联网时代，我们的用户可能使用浏览器也可能使用APP来访问我们的服务，我们的web应用可能是前后端分开部署在不同的端口，有时候我们还需要支持第三方登录，这下<code>Cookie-Session</code>的模式就有些力不从心了。</p>
-<p>JWT就是一种基于Token的轻量级认证模式，服务端认证通过后，会生成一个JSON对象，经过签名后得到一个Token（令牌）再发回给用户，用户后续请求只需要带上这个Token，服务端解密之后就能获取该用户的相关信息了。</p>
-<h3 id="结构令牌组成："><a href="#结构令牌组成：" class="headerlink" title="结构令牌组成："></a>结构令牌组成：</h3><ol>
-<li>标头（Header）</li>
-<li>有效载荷（Payload）</li>
-<li>签名（Signature）</li>
-</ol>
-<p>token格式：head.payload.singurater 如：xxxxx.yyyy.zzzz</p>
-<h2 id="3、安装JWT"><a href="#3、安装JWT" class="headerlink" title="3、安装JWT"></a>3、安装JWT</h2><p>我们使用 Go 语言社区中的 jwt 相关库来构建我们的应用，例如：<a target="_blank" rel="noopener" href="https://github.com/golang-jwt/jwt%E3%80%82">https://github.com/golang-jwt/jwt。</a></p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">go</span> get github.com/golang-jwt/jwt/v4  </span><br></pre></td></tr></table></figure>
-
-<p>本文将使用这个库来实现我们生成JWT和解析JWT的功能。</p>
-<h2 id="4、使用"><a href="#4、使用" class="headerlink" title="4、使用"></a>4、使用</h2><h3 id="1-、默认的Claim"><a href="#1-、默认的Claim" class="headerlink" title="(1)、默认的Claim"></a>(1)、默认的Claim</h3><p>如果我们直接使用JWT中默认的字段，没有其他定制化的需求则可以直接使用这个包中的和方法快速生成和解析token。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">// 用于签名的字符串</span><br><span class="line">var mySigningKey = []byte(&quot;rivermoonsx.com&quot;)</span><br><span class="line"></span><br><span class="line">// GenRegisteredClaims 使用默认声明创建 jwt</span><br><span class="line">func GenRegisteredClaims() (string,error)&#123;</span><br><span class="line">	// 创建 Claims</span><br><span class="line">	claims := &amp;jwt.RegisteredClaims&#123;</span><br><span class="line">		ExpiresAt: jwt.NewNumericData(time.Now().Add(time.Hour * 24)), // 过期时间</span><br><span class="line">		Issuer: &quot;jiangyue&quot;, // 签发人</span><br><span class="line">	&#125;</span><br><span class="line">	// 生成 token 对象</span><br><span class="line">	token := jwt.NewWithClaims(jwt.SigningMethodHs256,claims)</span><br><span class="line">	// 生成签名字符串</span><br><span class="line">	return token.SignedString(mySigningKey)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// ParseRegisteredClaims 解析 jwt</span><br><span class="line">func ValidateRegisteredClaims(tokenString string) bool &#123;</span><br><span class="line">	// 解析 token</span><br><span class="line">	token,err := jwt.Parse(tokenString,func(token *jwt.Token) (interface&#123;&#125;,error)&#123;</span><br><span class="line">		return mySigningKey,nil</span><br><span class="line">	&#125;)</span><br><span class="line">	if err != nil &#123; // 解析token 失败</span><br><span class="line">		return false</span><br><span class="line">	&#125;</span><br><span class="line">	return token.Valid</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-、自定义Claims"><a href="#2-、自定义Claims" class="headerlink" title="(2)、自定义Claims"></a>(2)、自定义Claims</h3><p>我们需要定制自己的需求来决定JWT中保存哪些数据，比如我们规定在JWT中要存储<code>username</code>信息，那么我们就定义一个<code>MyClaims</code>结构体如下：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// CustomClaims 自定义声明类型 并内嵌jwt.RegisteredClaims</span><br><span class="line">// jwt包自带的jwt.RegisteredClaims只包含了官方字段</span><br><span class="line">// 假设我们这里需要额外记录一个username字段，所以要自定义结构体</span><br><span class="line">// 如果想要保存更多信息，都可以添加到这个结构体中</span><br><span class="line">type CustomClaims struct &#123;</span><br><span class="line">	// 可根据需要自行添加字段</span><br><span class="line">	Username             string `json:&quot;username&quot;`</span><br><span class="line">	jwt.RegisteredClaims        // 内嵌标准的声明</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>然后我们定义JWT的过期时间，这里以24小时为例：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">const TokenExpireDuration = time.Hour * 24</span><br></pre></td></tr></table></figure>
-
-<p>接下来还需要定义一个用于签名的字符串：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// CustomSecret 用于加盐的字符串</span><br><span class="line">var CustomSecret = []byte(&quot;夏天夏天悄悄过去&quot;)</span><br></pre></td></tr></table></figure>
-
-<h4 id="生成JWT"><a href="#生成JWT" class="headerlink" title="生成JWT"></a>生成JWT</h4><p>我们可以根据自己的业务需要封装一个生成 token 的函数。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">// GenToken 生成JWT</span><br><span class="line">func GenToken(username string) (string, error) &#123;</span><br><span class="line">	// 创建一个我们自己的声明</span><br><span class="line">	claims := CustomClaims&#123;</span><br><span class="line">		username, // 自定义字段</span><br><span class="line">		jwt.RegisteredClaims&#123;</span><br><span class="line">			ExpiresAt: jwt.NewNumericDate(time.Now().Add(TokenExpireDuration)),</span><br><span class="line">			Issuer:    &quot;my-project&quot;, // 签发人</span><br><span class="line">		&#125;,</span><br><span class="line">	&#125;</span><br><span class="line">	// 使用指定的签名方法创建签名对象</span><br><span class="line">	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)</span><br><span class="line">	// 使用指定的secret签名并获得完整的编码后的字符串token</span><br><span class="line">	return token.SignedString(CustomSecret)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h4 id="解析JWT"><a href="#解析JWT" class="headerlink" title="解析JWT"></a>解析JWT</h4><p>根据给定的 JWT 字符串，解析出数据。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">// ParseToken 解析JWT</span><br><span class="line">func ParseToken(tokenString string) (*CustomClaims, error) &#123;</span><br><span class="line">	// 解析token</span><br><span class="line">	// 如果是自定义Claim结构体则需要使用 ParseWithClaims 方法</span><br><span class="line">	token, err := jwt.ParseWithClaims(tokenString, &amp;CustomClaims&#123;&#125;, func(token *jwt.Token) (i interface&#123;&#125;, err error) &#123;</span><br><span class="line">		// 直接使用标准的Claim则可以直接使用Parse方法</span><br><span class="line">		//token, err := jwt.Parse(tokenString, func(token *jwt.Token) (i interface&#123;&#125;, err error) &#123;</span><br><span class="line">		return CustomSecret, nil</span><br><span class="line">	&#125;)</span><br><span class="line">	if err != nil &#123;</span><br><span class="line">		return nil, err</span><br><span class="line">	&#125;</span><br><span class="line">	// 对token对象中的Claim进行类型断言</span><br><span class="line">	if claims, ok := token.Claims.(*CustomClaims); ok &amp;&amp; token.Valid &#123; // 校验token</span><br><span class="line">		return claims, nil</span><br><span class="line">	&#125;</span><br><span class="line">	return nil, errors.New(&quot;invalid token&quot;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="5、在gin框架中使用JWT"><a href="#5、在gin框架中使用JWT" class="headerlink" title="5、在gin框架中使用JWT"></a>5、在gin框架中使用JWT</h2><p>首先我们注册一条路由<code>/auth</code>，对外提供获取Token的渠道：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">r.POST(&quot;/auth&quot;, authHandler)</span><br></pre></td></tr></table></figure>
-
-<p>我们的<code>authHandler</code>定义如下：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">func authHandler(c *gin.Context) &#123;</span><br><span class="line">	// 用户发送用户名和密码过来</span><br><span class="line">	var user UserInfo</span><br><span class="line">	err := c.ShouldBind(&amp;user)</span><br><span class="line">	if err != nil &#123;</span><br><span class="line">		c.JSON(http.StatusOK, gin.H&#123;</span><br><span class="line">			&quot;code&quot;: 2001,</span><br><span class="line">			&quot;msg&quot;:  &quot;无效的参数&quot;,</span><br><span class="line">		&#125;)</span><br><span class="line">		return</span><br><span class="line">	&#125;</span><br><span class="line">	// 校验用户名和密码是否正确</span><br><span class="line">	if user.Username == &quot;q1mi&quot; &amp;&amp; user.Password == &quot;q1mi123&quot; &#123;</span><br><span class="line">		// 生成Token</span><br><span class="line">		tokenString, _ := GenToken(user.Username)</span><br><span class="line">		c.JSON(http.StatusOK, gin.H&#123;</span><br><span class="line">			&quot;code&quot;: 2000,</span><br><span class="line">			&quot;msg&quot;:  &quot;success&quot;,</span><br><span class="line">			&quot;data&quot;: gin.H&#123;&quot;token&quot;: tokenString&#125;,</span><br><span class="line">		&#125;)</span><br><span class="line">		return</span><br><span class="line">	&#125;</span><br><span class="line">	c.JSON(http.StatusOK, gin.H&#123;</span><br><span class="line">		&quot;code&quot;: 2002,</span><br><span class="line">		&quot;msg&quot;:  &quot;鉴权失败&quot;,</span><br><span class="line">	&#125;)</span><br><span class="line">	return</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>用户通过上面的接口获取Token之后，后续就会携带着Token再来请求我们的其他接口，这个时候就需要对这些请求的Token进行校验操作了，很显然我们应该实现一个检验Token的中间件，具体实现如下：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">// JWTAuthMiddleware 基于JWT的认证中间件</span><br><span class="line">func JWTAuthMiddleware() func(c *gin.Context) &#123;</span><br><span class="line">	return func(c *gin.Context) &#123;</span><br><span class="line">		// 客户端携带Token有三种方式 1.放在请求头 2.放在请求体 3.放在URI</span><br><span class="line">		// 这里假设Token放在Header的Authorization中，并使用Bearer开头</span><br><span class="line">		// 这里的具体实现方式要依据你的实际业务情况决定</span><br><span class="line">		authHeader := c.Request.Header.Get(&quot;Authorization&quot;)</span><br><span class="line">		if authHeader == &quot;&quot; &#123;</span><br><span class="line">			c.JSON(http.StatusOK, gin.H&#123;</span><br><span class="line">				&quot;code&quot;: 2003,</span><br><span class="line">				&quot;msg&quot;:  &quot;请求头中auth为空&quot;,</span><br><span class="line">			&#125;)</span><br><span class="line">			c.Abort()</span><br><span class="line">			return</span><br><span class="line">		&#125;</span><br><span class="line">		// 按空格分割</span><br><span class="line">		parts := strings.SplitN(authHeader, &quot; &quot;, 2)</span><br><span class="line">		if !(len(parts) == 2 &amp;&amp; parts[0] == &quot;Bearer&quot;) &#123;</span><br><span class="line">			c.JSON(http.StatusOK, gin.H&#123;</span><br><span class="line">				&quot;code&quot;: 2004,</span><br><span class="line">				&quot;msg&quot;:  &quot;请求头中auth格式有误&quot;,</span><br><span class="line">			&#125;)</span><br><span class="line">			c.Abort()</span><br><span class="line">			return</span><br><span class="line">		&#125;</span><br><span class="line">		// parts[1]是获取到的tokenString，我们使用之前定义好的解析JWT的函数来解析它</span><br><span class="line">		mc, err := ParseToken(parts[1])</span><br><span class="line">		if err != nil &#123;</span><br><span class="line">			c.JSON(http.StatusOK, gin.H&#123;</span><br><span class="line">				&quot;code&quot;: 2005,</span><br><span class="line">				&quot;msg&quot;:  &quot;无效的Token&quot;,</span><br><span class="line">			&#125;)</span><br><span class="line">			c.Abort()</span><br><span class="line">			return</span><br><span class="line">		&#125;</span><br><span class="line">		// 将当前请求的username信息保存到请求的上下文c上</span><br><span class="line">		c.Set(&quot;username&quot;, mc.Username)</span><br><span class="line">		c.Next() // 后续的处理函数可以用过c.Get(&quot;username&quot;)来获取当前请求的用户信息</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>注册一个<code>/home</code>路由，发个请求验证一下吧。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">r.GET(&quot;/home&quot;, JWTAuthMiddleware(), homeHandler)</span><br><span class="line"></span><br><span class="line">func homeHandler(c *gin.Context) &#123;</span><br><span class="line">	username := c.MustGet(&quot;username&quot;).(string)</span><br><span class="line">	c.JSON(http.StatusOK, gin.H&#123;</span><br><span class="line">		&quot;code&quot;: 2000,</span><br><span class="line">		&quot;msg&quot;:  &quot;success&quot;,</span><br><span class="line">		&quot;data&quot;: gin.H&#123;&quot;username&quot;: username&#125;,</span><br><span class="line">	&#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>如果不想自己实现上述功能，你也可以使用Github上别人封装好的包，比如<a target="_blank" rel="noopener" href="https://github.com/appleboy/gin-jwt%E3%80%82">https://github.com/appleboy/gin-jwt。</a></p>
-<h4 id="refresh-token"><a href="#refresh-token" class="headerlink" title="refresh token"></a>refresh token</h4><p>在某些业务场景下，我们可能还需要使用refresh token。</p>
-<p>这里可以参考 <a target="_blank" rel="noopener" href="https://datatracker.ietf.org/doc/html/rfc6749#section-1.5">RFC 6749 OAuth2.0中关于refresh token的介绍</a></p>
-
-      
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/07/29/%E5%9C%A8gin%E6%A1%86%E6%9E%B6%E4%B8%AD%E4%BD%BF%E7%94%A8JWT/" rel="prev" title="在gin框架中使用JWT">
+      <i class="fa fa-chevron-left"></i> 在gin框架中使用JWT
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/07/29/%E5%88%86%E5%B8%83%E5%BC%8FID%E7%AE%97%E6%B3%95/" rel="next" title="分布式ID算法">
+      分布式ID算法 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
       </footer>
+    
   </article>
   
   
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/07/29/my-first-blog/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="江月">
-      <meta itemprop="description" content="你尽管努力剩下的交给天意">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="江月随笔">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/07/29/my-first-blog/" class="post-title-link" itemprop="url">my-first-blog</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-07-29 16:41:28" itemprop="dateCreated datePublished" datetime="2023-07-29T16:41:28+08:00">2023-07-29</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/07/29/hello-world/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="江月">
-      <meta itemprop="description" content="你尽管努力剩下的交给天意">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="江月随笔">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/07/29/hello-world/" class="post-title-link" itemprop="url">Hello World</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-07-29 10:03:10" itemprop="dateCreated datePublished" datetime="2023-07-29T10:03:10+08:00">2023-07-29</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-
   
 
 
@@ -784,6 +479,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%A8Go%E8%AF%AD%E8%A8%80%E9%A1%B9%E7%9B%AE%E4%B8%AD%E4%BD%BF%E7%94%A8Zap%E6%97%A5%E5%BF%97%E5%BA%93"><span class="nav-number">1.</span> <span class="nav-text">在Go语言项目中使用Zap日志库</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.1.</span> <span class="nav-text">一、介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E9%BB%98%E8%AE%A4%E7%9A%84Go-Logger"><span class="nav-number">1.2.</span> <span class="nav-text">二、默认的Go Logger</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0Go-Logger"><span class="nav-number">1.2.1.</span> <span class="nav-text">实现Go Logger</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%AE%BE%E7%BD%AELogger"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">设置Logger</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8Logger"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">使用Logger</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Logger%E7%9A%84%E8%BF%90%E8%A1%8C"><span class="nav-number">1.2.1.3.</span> <span class="nav-text">Logger的运行</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Go-Logger%E7%9A%84%E4%BC%98%E5%8A%BF%E5%92%8C%E5%8A%A3%E5%8A%BF"><span class="nav-number">1.2.2.</span> <span class="nav-text">Go Logger的优势和劣势</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BC%98%E5%8A%BF"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">优势</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%8A%A3%E5%8A%BF"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">劣势</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E3%80%81Uber-go-Zap"><span class="nav-number">1.3.</span> <span class="nav-text">三、Uber-go Zap</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%80%89%E6%8B%A9Uber-go-zap"><span class="nav-number">1.3.1.</span> <span class="nav-text">为什么选择Uber-go zap</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%AE%89%E8%A3%85"><span class="nav-number">1.3.1.1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%85%8D%E7%BD%AEZap-Logger"><span class="nav-number">1.3.1.2.</span> <span class="nav-text">配置Zap Logger</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Logger"><span class="nav-number">1.3.1.3.</span> <span class="nav-text">Logger</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Sugared-Logger"><span class="nav-number">1.3.1.4.</span> <span class="nav-text">Sugared Logger</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9A%E5%88%B6logger"><span class="nav-number">1.3.2.</span> <span class="nav-text">定制logger</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%B0%86%E6%97%A5%E5%BF%97%E5%86%99%E5%85%A5%E6%96%87%E4%BB%B6%E8%80%8C%E4%B8%8D%E6%98%AF%E7%BB%88%E7%AB%AF"><span class="nav-number">1.3.2.1.</span> <span class="nav-text">将日志写入文件而不是终端</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%B0%86JSON-Encoder%E6%9B%B4%E6%94%B9%E4%B8%BA%E6%99%AE%E9%80%9A%E7%9A%84Log-Encoder"><span class="nav-number">1.3.2.2.</span> <span class="nav-text">将JSON Encoder更改为普通的Log Encoder</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%9B%B4%E6%94%B9%E6%97%B6%E9%97%B4%E7%BC%96%E7%A0%81%E5%B9%B6%E6%B7%BB%E5%8A%A0%E8%B0%83%E7%94%A8%E8%80%85%E8%AF%A6%E7%BB%86%E4%BF%A1%E6%81%AF"><span class="nav-number">1.3.2.3.</span> <span class="nav-text">更改时间编码并添加调用者详细信息</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#AddCallerSkip"><span class="nav-number">1.3.2.4.</span> <span class="nav-text">AddCallerSkip</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%B0%86%E6%97%A5%E5%BF%97%E8%BE%93%E5%87%BA%E5%88%B0%E5%A4%9A%E4%B8%AA%E4%BD%8D%E7%BD%AE"><span class="nav-number">1.3.2.5.</span> <span class="nav-text">将日志输出到多个位置</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%B0%86err%E6%97%A5%E5%BF%97%E5%8D%95%E7%8B%AC%E8%BE%93%E5%87%BA%E5%88%B0%E6%96%87%E4%BB%B6"><span class="nav-number">1.3.2.6.</span> <span class="nav-text">将err日志单独输出到文件</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8Lumberjack%E8%BF%9B%E8%A1%8C%E6%97%A5%E5%BF%97%E5%88%87%E5%89%B2%E5%BD%92%E6%A1%A3"><span class="nav-number">1.3.3.</span> <span class="nav-text">使用Lumberjack进行日志切割归档</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%AE%89%E8%A3%85-1"><span class="nav-number">1.3.3.1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#zap-logger%E4%B8%AD%E5%8A%A0%E5%85%A5Lumberjack"><span class="nav-number">1.3.3.2.</span> <span class="nav-text">zap logger中加入Lumberjack</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E6%89%80%E6%9C%89%E5%8A%9F%E8%83%BD"><span class="nav-number">1.3.3.3.</span> <span class="nav-text">测试所有功能</span></a></li></ol></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 

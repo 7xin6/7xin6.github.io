@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="1、什么是 JWT ？含义：JWT全称 JSON Web Token 是一种跨域认证解决方案，属于一个开放的标准，它规定了一种 Token  实现方式，目前多用于前后端分离项目和OAuth2.0业务场景下。 2、为什么需要 JWT ？在之前的一些web项目（单体项目）中，我们通常使用的是Cookie-Session模式实现用户认证。相关流程大致如下：  用户在浏览器端填写用户名和密码，并发送给服务">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在gin框架中使用JWT">
+<meta property="og:url" content="http://example.com/2023/07/29/%E5%9C%A8gin%E6%A1%86%E6%9E%B6%E4%B8%AD%E4%BD%BF%E7%94%A8JWT/index.html">
+<meta property="og:site_name" content="江月随笔">
+<meta property="og:description" content="1、什么是 JWT ？含义：JWT全称 JSON Web Token 是一种跨域认证解决方案，属于一个开放的标准，它规定了一种 Token  实现方式，目前多用于前后端分离项目和OAuth2.0业务场景下。 2、为什么需要 JWT ？在之前的一些web项目（单体项目）中，我们通常使用的是Cookie-Session模式实现用户认证。相关流程大致如下：  用户在浏览器端填写用户名和密码，并发送给服务">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-07-29T12:24:12.000Z">
+<meta property="article:modified_time" content="2023-07-29T12:57:44.436Z">
+<meta property="article:author" content="江月">
+<meta property="article:tag" content="gin">
+<meta property="article:tag" content="token验证">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2023/07/29/%E5%9C%A8gin%E6%A1%86%E6%9E%B6%E4%B8%AD%E4%BD%BF%E7%94%A8JWT/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>在gin框架中使用JWT | 江月随笔</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">江月随笔</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-resources">
+
+    <a href="/resources/" rel="section"><i class="fas fa-sticky-note fa-fw"></i>资源</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/07/29/%E5%9C%A8gin%E6%A1%86%E6%9E%B6%E4%B8%AD%E4%BD%BF%E7%94%A8JWT/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="江月">
+      <meta itemprop="description" content="你尽管努力剩下的交给天意">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="江月随笔">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          在gin框架中使用JWT
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-07-29 20:24:12 / 修改时间：20:57:44" itemprop="dateCreated datePublished" datetime="2023-07-29T20:24:12+08:00">2023-07-29</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/token/" itemprop="url" rel="index"><span itemprop="name">token</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="1、什么是-JWT-？"><a href="#1、什么是-JWT-？" class="headerlink" title="1、什么是 JWT ？"></a>1、什么是 JWT ？</h2><p>含义：JWT全称 JSON Web Token 是一种跨域认证解决方案，属于一个开放的标准，它规定了一种 Token  实现方式，目前多用于前后端分离项目和OAuth2.0业务场景下。</p>
+<h2 id="2、为什么需要-JWT-？"><a href="#2、为什么需要-JWT-？" class="headerlink" title="2、为什么需要 JWT ？"></a>2、为什么需要 JWT ？</h2><p>在之前的一些web项目（单体项目）中，我们通常使用的是<code>Cookie-Session</code>模式实现用户认证。相关流程大致如下：</p>
+<ol>
+<li>用户在浏览器端填写用户名和密码，并发送给服务端</li>
+<li>服务端对用户名和密码校验通过后会生成一份保存当前用户相关信息的session数据和一个与之对应的标识（通常称为session_id）</li>
+<li>服务端返回响应时将上一步的session_id写入用户浏览器的Cookie</li>
+<li>后续用户来自该浏览器的每次请求都会自动携带包含session_id的Cookie</li>
+<li>服务端通过请求中的session_id就能找到之前保存的该用户那份session数据，从而获取该用户的相关信息。</li>
+</ol>
+<p>这种方案依赖于<strong>客户端（浏览器）保存 Cookie，并且需要在服务端存储用户的session数据</strong>。</p>
+<p>在移动互联网时代，我们的用户可能使用浏览器也可能使用APP来访问我们的服务，我们的web应用可能是前后端分开部署在不同的端口，有时候我们还需要支持第三方登录，这下<code>Cookie-Session</code>的模式就有些力不从心了。</p>
+<p>JWT就是一种基于Token的轻量级认证模式，服务端认证通过后，会生成一个JSON对象，经过签名后得到一个Token（令牌）再发回给用户，用户后续请求只需要带上这个Token，服务端解密之后就能获取该用户的相关信息了。</p>
+<h3 id="结构令牌组成："><a href="#结构令牌组成：" class="headerlink" title="结构令牌组成："></a>结构令牌组成：</h3><ol>
+<li>标头（Header）</li>
+<li>有效载荷（Payload）</li>
+<li>签名（Signature）</li>
+</ol>
+<p>token格式：head.payload.singurater 如：xxxxx.yyyy.zzzz</p>
+<h2 id="3、安装JWT"><a href="#3、安装JWT" class="headerlink" title="3、安装JWT"></a>3、安装JWT</h2><p>我们使用 Go 语言社区中的 jwt 相关库来构建我们的应用，例如：<a target="_blank" rel="noopener" href="https://github.com/golang-jwt/jwt%E3%80%82">https://github.com/golang-jwt/jwt。</a></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">go</span> get github.com/golang-jwt/jwt/v4  </span><br></pre></td></tr></table></figure>
+
+<p>本文将使用这个库来实现我们生成JWT和解析JWT的功能。</p>
+<h2 id="4、使用"><a href="#4、使用" class="headerlink" title="4、使用"></a>4、使用</h2><h3 id="1-、默认的Claim"><a href="#1-、默认的Claim" class="headerlink" title="(1)、默认的Claim"></a>(1)、默认的Claim</h3><p>如果我们直接使用JWT中默认的字段，没有其他定制化的需求则可以直接使用这个包中的和方法快速生成和解析token。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">// 用于签名的字符串</span><br><span class="line">var mySigningKey = []byte(&quot;rivermoonsx.com&quot;)</span><br><span class="line"></span><br><span class="line">// GenRegisteredClaims 使用默认声明创建 jwt</span><br><span class="line">func GenRegisteredClaims() (string,error)&#123;</span><br><span class="line">	// 创建 Claims</span><br><span class="line">	claims := &amp;jwt.RegisteredClaims&#123;</span><br><span class="line">		ExpiresAt: jwt.NewNumericData(time.Now().Add(time.Hour * 24)), // 过期时间</span><br><span class="line">		Issuer: &quot;jiangyue&quot;, // 签发人</span><br><span class="line">	&#125;</span><br><span class="line">	// 生成 token 对象</span><br><span class="line">	token := jwt.NewWithClaims(jwt.SigningMethodHs256,claims)</span><br><span class="line">	// 生成签名字符串</span><br><span class="line">	return token.SignedString(mySigningKey)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// ParseRegisteredClaims 解析 jwt</span><br><span class="line">func ValidateRegisteredClaims(tokenString string) bool &#123;</span><br><span class="line">	// 解析 token</span><br><span class="line">	token,err := jwt.Parse(tokenString,func(token *jwt.Token) (interface&#123;&#125;,error)&#123;</span><br><span class="line">		return mySigningKey,nil</span><br><span class="line">	&#125;)</span><br><span class="line">	if err != nil &#123; // 解析token 失败</span><br><span class="line">		return false</span><br><span class="line">	&#125;</span><br><span class="line">	return token.Valid</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-、自定义Claims"><a href="#2-、自定义Claims" class="headerlink" title="(2)、自定义Claims"></a>(2)、自定义Claims</h3><p>我们需要定制自己的需求来决定JWT中保存哪些数据，比如我们规定在JWT中要存储<code>username</code>信息，那么我们就定义一个<code>MyClaims</code>结构体如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// CustomClaims 自定义声明类型 并内嵌jwt.RegisteredClaims</span><br><span class="line">// jwt包自带的jwt.RegisteredClaims只包含了官方字段</span><br><span class="line">// 假设我们这里需要额外记录一个username字段，所以要自定义结构体</span><br><span class="line">// 如果想要保存更多信息，都可以添加到这个结构体中</span><br><span class="line">type CustomClaims struct &#123;</span><br><span class="line">	// 可根据需要自行添加字段</span><br><span class="line">	Username             string `json:&quot;username&quot;`</span><br><span class="line">	jwt.RegisteredClaims        // 内嵌标准的声明</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后我们定义JWT的过期时间，这里以24小时为例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">const TokenExpireDuration = time.Hour * 24</span><br></pre></td></tr></table></figure>
+
+<p>接下来还需要定义一个用于签名的字符串：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// CustomSecret 用于加盐的字符串</span><br><span class="line">var CustomSecret = []byte(&quot;夏天夏天悄悄过去&quot;)</span><br></pre></td></tr></table></figure>
+
+<h4 id="生成JWT"><a href="#生成JWT" class="headerlink" title="生成JWT"></a>生成JWT</h4><p>我们可以根据自己的业务需要封装一个生成 token 的函数。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">// GenToken 生成JWT</span><br><span class="line">func GenToken(username string) (string, error) &#123;</span><br><span class="line">	// 创建一个我们自己的声明</span><br><span class="line">	claims := CustomClaims&#123;</span><br><span class="line">		username, // 自定义字段</span><br><span class="line">		jwt.RegisteredClaims&#123;</span><br><span class="line">			ExpiresAt: jwt.NewNumericDate(time.Now().Add(TokenExpireDuration)),</span><br><span class="line">			Issuer:    &quot;my-project&quot;, // 签发人</span><br><span class="line">		&#125;,</span><br><span class="line">	&#125;</span><br><span class="line">	// 使用指定的签名方法创建签名对象</span><br><span class="line">	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)</span><br><span class="line">	// 使用指定的secret签名并获得完整的编码后的字符串token</span><br><span class="line">	return token.SignedString(CustomSecret)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="解析JWT"><a href="#解析JWT" class="headerlink" title="解析JWT"></a>解析JWT</h4><p>根据给定的 JWT 字符串，解析出数据。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">// ParseToken 解析JWT</span><br><span class="line">func ParseToken(tokenString string) (*CustomClaims, error) &#123;</span><br><span class="line">	// 解析token</span><br><span class="line">	// 如果是自定义Claim结构体则需要使用 ParseWithClaims 方法</span><br><span class="line">	token, err := jwt.ParseWithClaims(tokenString, &amp;CustomClaims&#123;&#125;, func(token *jwt.Token) (i interface&#123;&#125;, err error) &#123;</span><br><span class="line">		// 直接使用标准的Claim则可以直接使用Parse方法</span><br><span class="line">		//token, err := jwt.Parse(tokenString, func(token *jwt.Token) (i interface&#123;&#125;, err error) &#123;</span><br><span class="line">		return CustomSecret, nil</span><br><span class="line">	&#125;)</span><br><span class="line">	if err != nil &#123;</span><br><span class="line">		return nil, err</span><br><span class="line">	&#125;</span><br><span class="line">	// 对token对象中的Claim进行类型断言</span><br><span class="line">	if claims, ok := token.Claims.(*CustomClaims); ok &amp;&amp; token.Valid &#123; // 校验token</span><br><span class="line">		return claims, nil</span><br><span class="line">	&#125;</span><br><span class="line">	return nil, errors.New(&quot;invalid token&quot;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="5、在gin框架中使用JWT"><a href="#5、在gin框架中使用JWT" class="headerlink" title="5、在gin框架中使用JWT"></a>5、在gin框架中使用JWT</h2><p>首先我们注册一条路由<code>/auth</code>，对外提供获取Token的渠道：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">r.POST(&quot;/auth&quot;, authHandler)</span><br></pre></td></tr></table></figure>
+
+<p>我们的<code>authHandler</code>定义如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">func authHandler(c *gin.Context) &#123;</span><br><span class="line">	// 用户发送用户名和密码过来</span><br><span class="line">	var user UserInfo</span><br><span class="line">	err := c.ShouldBind(&amp;user)</span><br><span class="line">	if err != nil &#123;</span><br><span class="line">		c.JSON(http.StatusOK, gin.H&#123;</span><br><span class="line">			&quot;code&quot;: 2001,</span><br><span class="line">			&quot;msg&quot;:  &quot;无效的参数&quot;,</span><br><span class="line">		&#125;)</span><br><span class="line">		return</span><br><span class="line">	&#125;</span><br><span class="line">	// 校验用户名和密码是否正确</span><br><span class="line">	if user.Username == &quot;q1mi&quot; &amp;&amp; user.Password == &quot;q1mi123&quot; &#123;</span><br><span class="line">		// 生成Token</span><br><span class="line">		tokenString, _ := GenToken(user.Username)</span><br><span class="line">		c.JSON(http.StatusOK, gin.H&#123;</span><br><span class="line">			&quot;code&quot;: 2000,</span><br><span class="line">			&quot;msg&quot;:  &quot;success&quot;,</span><br><span class="line">			&quot;data&quot;: gin.H&#123;&quot;token&quot;: tokenString&#125;,</span><br><span class="line">		&#125;)</span><br><span class="line">		return</span><br><span class="line">	&#125;</span><br><span class="line">	c.JSON(http.StatusOK, gin.H&#123;</span><br><span class="line">		&quot;code&quot;: 2002,</span><br><span class="line">		&quot;msg&quot;:  &quot;鉴权失败&quot;,</span><br><span class="line">	&#125;)</span><br><span class="line">	return</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>用户通过上面的接口获取Token之后，后续就会携带着Token再来请求我们的其他接口，这个时候就需要对这些请求的Token进行校验操作了，很显然我们应该实现一个检验Token的中间件，具体实现如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">// JWTAuthMiddleware 基于JWT的认证中间件</span><br><span class="line">func JWTAuthMiddleware() func(c *gin.Context) &#123;</span><br><span class="line">	return func(c *gin.Context) &#123;</span><br><span class="line">		// 客户端携带Token有三种方式 1.放在请求头 2.放在请求体 3.放在URI</span><br><span class="line">		// 这里假设Token放在Header的Authorization中，并使用Bearer开头</span><br><span class="line">		// 这里的具体实现方式要依据你的实际业务情况决定</span><br><span class="line">		authHeader := c.Request.Header.Get(&quot;Authorization&quot;)</span><br><span class="line">		if authHeader == &quot;&quot; &#123;</span><br><span class="line">			c.JSON(http.StatusOK, gin.H&#123;</span><br><span class="line">				&quot;code&quot;: 2003,</span><br><span class="line">				&quot;msg&quot;:  &quot;请求头中auth为空&quot;,</span><br><span class="line">			&#125;)</span><br><span class="line">			c.Abort()</span><br><span class="line">			return</span><br><span class="line">		&#125;</span><br><span class="line">		// 按空格分割</span><br><span class="line">		parts := strings.SplitN(authHeader, &quot; &quot;, 2)</span><br><span class="line">		if !(len(parts) == 2 &amp;&amp; parts[0] == &quot;Bearer&quot;) &#123;</span><br><span class="line">			c.JSON(http.StatusOK, gin.H&#123;</span><br><span class="line">				&quot;code&quot;: 2004,</span><br><span class="line">				&quot;msg&quot;:  &quot;请求头中auth格式有误&quot;,</span><br><span class="line">			&#125;)</span><br><span class="line">			c.Abort()</span><br><span class="line">			return</span><br><span class="line">		&#125;</span><br><span class="line">		// parts[1]是获取到的tokenString，我们使用之前定义好的解析JWT的函数来解析它</span><br><span class="line">		mc, err := ParseToken(parts[1])</span><br><span class="line">		if err != nil &#123;</span><br><span class="line">			c.JSON(http.StatusOK, gin.H&#123;</span><br><span class="line">				&quot;code&quot;: 2005,</span><br><span class="line">				&quot;msg&quot;:  &quot;无效的Token&quot;,</span><br><span class="line">			&#125;)</span><br><span class="line">			c.Abort()</span><br><span class="line">			return</span><br><span class="line">		&#125;</span><br><span class="line">		// 将当前请求的username信息保存到请求的上下文c上</span><br><span class="line">		c.Set(&quot;username&quot;, mc.Username)</span><br><span class="line">		c.Next() // 后续的处理函数可以用过c.Get(&quot;username&quot;)来获取当前请求的用户信息</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注册一个<code>/home</code>路由，发个请求验证一下吧。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">r.GET(&quot;/home&quot;, JWTAuthMiddleware(), homeHandler)</span><br><span class="line"></span><br><span class="line">func homeHandler(c *gin.Context) &#123;</span><br><span class="line">	username := c.MustGet(&quot;username&quot;).(string)</span><br><span class="line">	c.JSON(http.StatusOK, gin.H&#123;</span><br><span class="line">		&quot;code&quot;: 2000,</span><br><span class="line">		&quot;msg&quot;:  &quot;success&quot;,</span><br><span class="line">		&quot;data&quot;: gin.H&#123;&quot;username&quot;: username&#125;,</span><br><span class="line">	&#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果不想自己实现上述功能，你也可以使用Github上别人封装好的包，比如<a target="_blank" rel="noopener" href="https://github.com/appleboy/gin-jwt%E3%80%82">https://github.com/appleboy/gin-jwt。</a></p>
+<h4 id="refresh-token"><a href="#refresh-token" class="headerlink" title="refresh token"></a>refresh token</h4><p>在某些业务场景下，我们可能还需要使用refresh token。</p>
+<p>这里可以参考 <a target="_blank" rel="noopener" href="https://datatracker.ietf.org/doc/html/rfc6749#section-1.5">RFC 6749 OAuth2.0中关于refresh token的介绍</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/gin/" rel="tag"># gin</a>
+              <a href="/tags/token%E9%AA%8C%E8%AF%81/" rel="tag"># token验证</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/07/29/my-first-blog/" rel="prev" title="my-first-blog">
+      <i class="fa fa-chevron-left"></i> my-first-blog
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/07/29/%E5%9C%A8Go%E8%AF%AD%E8%A8%80%E9%A1%B9%E7%9B%AE%E4%B8%AD%E4%BD%BF%E7%94%A8Zap%E6%97%A5%E5%BF%97%E5%BA%93/" rel="next" title="在Go语言项目中使用Zap日志库">
+      在Go语言项目中使用Zap日志库 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1%E3%80%81%E4%BB%80%E4%B9%88%E6%98%AF-JWT-%EF%BC%9F"><span class="nav-number">1.</span> <span class="nav-text">1、什么是 JWT ？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2%E3%80%81%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81-JWT-%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">2、为什么需要 JWT ？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E6%9E%84%E4%BB%A4%E7%89%8C%E7%BB%84%E6%88%90%EF%BC%9A"><span class="nav-number">2.1.</span> <span class="nav-text">结构令牌组成：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3%E3%80%81%E5%AE%89%E8%A3%85JWT"><span class="nav-number">3.</span> <span class="nav-text">3、安装JWT</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4%E3%80%81%E4%BD%BF%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">4、使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E3%80%81%E9%BB%98%E8%AE%A4%E7%9A%84Claim"><span class="nav-number">4.1.</span> <span class="nav-text">(1)、默认的Claim</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E3%80%81%E8%87%AA%E5%AE%9A%E4%B9%89Claims"><span class="nav-number">4.2.</span> <span class="nav-text">(2)、自定义Claims</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%94%9F%E6%88%90JWT"><span class="nav-number">4.2.1.</span> <span class="nav-text">生成JWT</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%A7%A3%E6%9E%90JWT"><span class="nav-number">4.2.2.</span> <span class="nav-text">解析JWT</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5%E3%80%81%E5%9C%A8gin%E6%A1%86%E6%9E%B6%E4%B8%AD%E4%BD%BF%E7%94%A8JWT"><span class="nav-number">5.</span> <span class="nav-text">5、在gin框架中使用JWT</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#refresh-token"><span class="nav-number">5.0.1.</span> <span class="nav-text">refresh token</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="江月"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">江月</p>
+  <div class="site-description" itemprop="description">你尽管努力剩下的交给天意</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2023-07 – 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">江月</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/love.js"></script>
+</html>
