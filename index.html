@@ -169,6 +169,106 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/08/03/scheduler-%E5%BC%82%E6%AD%A5%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%99%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="江月">
+      <meta itemprop="description" content="你尽管努力剩下的交给天意">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="江月随笔">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/08/03/scheduler-%E5%BC%82%E6%AD%A5%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%99%A8/" class="post-title-link" itemprop="url">scheduler-异步任务调度器</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-08-03 16:41:35 / 修改时间：17:58:39" itemprop="dateCreated datePublished" datetime="2023-08-03T16:41:35+08:00">2023-08-03</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/scheduler/" itemprop="url" rel="index"><span itemprop="name">scheduler</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>一、什么是 scheduler</p>
+<p>​		scheduler 直接翻译来说，就是调度器，对于一些普通的 **RestFul-Api **没有办法马上出结果的任务进行一个延迟处理。</p>
+<p>​		这些任务都会被分发到 scheduler 里面，然后由 scheduler 根据carryer或者 interval，制定一个定时器来触发或者是延迟触发</p>
+<p>​		经常应用于需要异步处理的场景。</p>
+<p>二、为什么需要 scheduler</p>
+<p>​		因为我们系统中有一个异步处理请求。</p>
+<p>​		比如说：对于博客的删除，需要经过审核的一个过程，那么我们在删除数据的时候一般会做一个source delay，一般用户是看不到，</p>
+<p>​		但是后台确实存在。它会将这个任务下发到 scheduler ，scheduler 会经过一段时间，进行处理。</p>
+<p>三、scheduler的框架</p>
+<p>​		scheduler的框架架构类似于 消费者(Producer&#x2F;Dispatcher) 和 生产者(Consumer&#x2F;Executor) 模式 , 任务首先下发到 Dispatcher中然	后通过信道传送到 Executor。</p>
+<p>​		1、Dispatcher：接受 任务，并将任务分配给 executor</p>
+<p>​		2、Executor： 处理任务</p>
+<p>​		3、timer：定时器，制定任务处理的周期</p>
+<p>​		这三者合称为 task runner：</p>
+<p>​		<img src="/images/scheduler.png"></p>
+<p>四、代码实现</p>
+<p>​		接下来将以 Go语言代码具体实现 scheduler</p>
+<p>1、创建一个 Runner 结构体，并自定以一个初始化函数</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> (</span><br><span class="line">	READYTODISPATCH = <span class="string">&quot;d&quot;</span></span><br><span class="line">	READYTOEXECUTE  = <span class="string">&quot;e&quot;</span></span><br><span class="line">	CLOSE           = <span class="string">&quot;c&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> controlChan <span class="keyword">chan</span> <span class="type">string</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> dataChan <span class="keyword">chan</span> <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> fn <span class="function"><span class="keyword">func</span><span class="params">(dc dataChan)</span></span> erro</span><br><span class="line"></span><br><span class="line"><span class="comment">// Runner</span></span><br><span class="line"><span class="keyword">type</span> Runner <span class="keyword">struct</span> &#123;</span><br><span class="line">	Controller controlChan <span class="comment">// 存放处理方式</span></span><br><span class="line">	Error      controlChan <span class="comment">// 存放错误处理</span></span><br><span class="line">	Data       dataChan    <span class="comment">// 存放数据</span></span><br><span class="line">	dataSize   <span class="type">int</span>         <span class="comment">// 数据大小</span></span><br><span class="line">	longLived  <span class="type">bool</span>        <span class="comment">// 数据是否长时间存活</span></span><br><span class="line">	Dispatcher fn          <span class="comment">// 任务分配函数</span></span><br><span class="line">	Executor   fn          <span class="comment">// 任务处理函数</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// NewRunner 初始化</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">NewRunner</span><span class="params">(size <span class="type">int</span>, longLived <span class="type">bool</span>, d fn, e fn)</span></span> *Runner &#123;</span><br><span class="line">	<span class="keyword">return</span> &amp;Runner&#123;</span><br><span class="line">		Controller: <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="type">string</span>, <span class="number">1</span>),</span><br><span class="line">		Error:      <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="type">string</span>, <span class="number">1</span>),</span><br><span class="line">		Data:       <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">interface</span>&#123;&#125;, size),</span><br><span class="line">		dataSize:   size,</span><br><span class="line">		longLived:  longLived,</span><br><span class="line">		Dispatcher: d,</span><br><span class="line">		Executor:   e,</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>2、开启 scheduler 服务,通过 信道channel 实现数据的并存</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(r *Runner)</span></span> startDispatch() &#123;</span><br><span class="line">	<span class="keyword">defer</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		<span class="keyword">if</span> !r.longLived &#123;</span><br><span class="line">			<span class="built_in">close</span>(r.Controller)</span><br><span class="line">			<span class="built_in">close</span>(r.Data)</span><br><span class="line">			<span class="built_in">close</span>(r.Error)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;()</span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		<span class="keyword">select</span> &#123;</span><br><span class="line">		<span class="keyword">case</span> c := &lt;-r.Controller:</span><br><span class="line">			<span class="keyword">if</span> c == READYTODISPATCH &#123; <span class="comment">// 任务分配</span></span><br><span class="line">				err := r.Dispatcher(r.Data)</span><br><span class="line">				<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">					r.Error &lt;- CLOSE</span><br><span class="line">				&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">					r.Controller &lt;- READYTOEXECUTE</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">if</span> c == READYTOEXECUTE &#123; <span class="comment">// 处理任务</span></span><br><span class="line">				err := r.Executor(r.Data)</span><br><span class="line">				<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">					r.Error &lt;- CLOSE</span><br><span class="line">				&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">					r.Controller &lt;- READYTOEXECUTE</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">case</span> e := &lt;-r.Error:</span><br><span class="line">			<span class="keyword">if</span> e == CLOSE &#123;</span><br><span class="line">				<span class="keyword">return</span></span><br><span class="line">			&#125;</span><br><span class="line">		<span class="keyword">default</span>:</span><br><span class="line">			fmt.Println(<span class="string">&quot;the is default case&quot;</span>)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>3、定义一个提起服务的函数</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(r *Runner)</span></span> StartAll() &#123; <span class="comment">// 提起服务</span></span><br><span class="line"><span class="comment">// 如果没有一开始的这个写操作，runner 将处于阻塞状态，也就是一直会走 default 的处理接口</span></span><br><span class="line">	r.Controller &lt;- READYTODISPATCH </span><br><span class="line">	r.startDispatch()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>4、定义 timer 定时器</p>
+<p>​	主要使用到 time.Ticker 底层实现是一个 channel 定期的向这个channel中传入一个数据，表示需要提起服务</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Worker <span class="keyword">struct</span> &#123;</span><br><span class="line">	ticker *time.Ticker</span><br><span class="line">	runner *Runner</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">NewWorker</span><span class="params">(interval time.Duration, r *Runner)</span></span> *Worker &#123;</span><br><span class="line">	<span class="keyword">return</span> &amp;Worker&#123;</span><br><span class="line">		ticker: time.NewTicker(interval * time.Second), <span class="comment">// 定义一个定时器</span></span><br><span class="line">		runner: r,</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(w *Worker)</span></span> startWorker() &#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		<span class="keyword">select</span> &#123;</span><br><span class="line">		<span class="keyword">case</span> &lt;-w.ticker.C: <span class="comment">// 这里就是从 time.ticker中获取一个数据，没有数据将阻塞</span></span><br><span class="line">			<span class="keyword">go</span> w.runner.StartAll()</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Start</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// 初始化 runner 和定时器 并且启动服务</span></span><br><span class="line">	r := NewRunner(<span class="number">3</span>, <span class="literal">true</span>,Dispatcher, Executor) <span class="comment">//主要就是实现 Dispatcher 和 Executor 这两个函数 协程</span></span><br><span class="line">	w := NewWorker(<span class="number">3</span>, r)</span><br><span class="line">	<span class="keyword">go</span> w.startWorker()</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>5、具体的测试用例</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> taskrunner</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;log&quot;</span></span><br><span class="line">	<span class="string">&quot;testing&quot;</span></span><br><span class="line">	<span class="string">&quot;time&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestRunner</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	d := <span class="function"><span class="keyword">func</span><span class="params">(dc dataChan)</span></span> <span class="type">error</span> &#123;</span><br><span class="line">		<span class="keyword">for</span> i := <span class="number">0</span>; i &lt; <span class="number">30</span>; i++ &#123;</span><br><span class="line">			dc &lt;- i</span><br><span class="line">			log.Println(<span class="string">&quot;dispatcher sent: &quot;</span>, i)</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	e := <span class="function"><span class="keyword">func</span><span class="params">(dc dataChan)</span></span> <span class="type">error</span> &#123;</span><br><span class="line">	forloop:</span><br><span class="line">		<span class="keyword">for</span> &#123;</span><br><span class="line">			<span class="keyword">select</span> &#123;</span><br><span class="line">			<span class="keyword">case</span> d := &lt;-dc:</span><br><span class="line">				log.Println(<span class="string">&quot;executor received: &quot;</span>, d)</span><br><span class="line">			<span class="keyword">default</span>:</span><br><span class="line">				<span class="keyword">break</span> forloop</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line">	runner := NewRunner(<span class="number">30</span>, <span class="literal">false</span>, d, e)</span><br><span class="line">	<span class="keyword">go</span> runner.StartAll()        <span class="comment">// 如果说不是开启一个协程来的化他将一直处于执行状态</span></span><br><span class="line">	time.Sleep(<span class="number">5</span> * time.Second) <span class="comment">// 主线程会睡五秒钟，当主线程关闭 协程也会关闭</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2023/07/29/%E5%88%86%E5%B8%83%E5%BC%8FID%E7%AE%97%E6%B3%95/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -672,20 +772,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-count">4</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-count">3</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">6</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
